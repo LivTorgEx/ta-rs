@@ -49,3 +49,13 @@ pub trait High {
 pub trait Volume {
     fn volume(&self) -> f64;
 }
+
+/// Trading buy volume of a particular trading period.
+pub trait Buy {
+    fn buy(&self) -> f64;
+}
+
+/// Trading sell volume of a particular trading period.
+pub trait Sell {
+    fn sell(&self) -> f64;
+}

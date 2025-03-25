@@ -1,5 +1,5 @@
-use crate::errors::*;
 use crate::traits::{Close, High, Low, Open, Volume};
+use crate::{errors::*, Buy, Sell};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -18,6 +18,8 @@ use serde::{Deserialize, Serialize};
 ///     .low(15.0)
 ///     .close(21.0)
 ///     .volume(7500.0)
+///     .buy(1000.0)
+///     .sell(6500.0)
 ///     .build()
 ///     .unwrap();
 ///
@@ -26,6 +28,8 @@ use serde::{Deserialize, Serialize};
 /// assert_eq!(item.low(), 15.0);
 /// assert_eq!(item.close(), 21.0);
 /// assert_eq!(item.volume(), 7500.0);
+/// assert_eq!(item.buy(), 1000.0);
+/// assert_eq!(item.sell(), 6500.0);
 /// ```
 ///
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -36,6 +40,8 @@ pub struct DataItem {
     low: f64,
     close: f64,
     volume: f64,
+    buy: f64,
+    sell: f64,
 }
 
 impl DataItem {
@@ -74,12 +80,26 @@ impl Volume for DataItem {
     }
 }
 
+impl Buy for DataItem {
+    fn buy(&self) -> f64 {
+        self.buy
+    }
+}
+
+impl Sell for DataItem {
+    fn sell(&self) -> f64 {
+        self.sell
+    }
+}
+
 pub struct DataItemBuilder {
     open: Option<f64>,
     high: Option<f64>,
     low: Option<f64>,
     close: Option<f64>,
     volume: Option<f64>,
+    buy: Option<f64>,
+    sell: Option<f64>,
 }
 
 impl DataItemBuilder {
@@ -90,6 +110,8 @@ impl DataItemBuilder {
             low: None,
             close: None,
             volume: None,
+            buy: None,
+            sell: None,
         }
     }
 
@@ -118,16 +140,42 @@ impl DataItemBuilder {
         self
     }
 
+    pub fn buy(mut self, val: f64) -> Self {
+        self.buy = Some(val);
+        self
+    }
+
+    pub fn sell(mut self, val: f64) -> Self {
+        self.sell = Some(val);
+        self
+    }
+
     pub fn build(self) -> Result<DataItem> {
-        if let (Some(open), Some(high), Some(low), Some(close), Some(volume)) =
-            (self.open, self.high, self.low, self.close, self.volume)
-        {
+        if let (
+            Some(open),
+            Some(high),
+            Some(low),
+            Some(close),
+            Some(volume),
+            Some(buy),
+            Some(sell),
+        ) = (
+            self.open,
+            self.high,
+            self.low,
+            self.close,
+            self.volume,
+            self.buy,
+            self.sell,
+        ) {
             // validate
             if low <= open
                 && low <= close
                 && low <= high
                 && high >= open
                 && high >= close
+                && buy >= 0.0
+                && sell >= 0.0
                 && volume >= 0.0
             {
                 let item = DataItem {
@@ -136,6 +184,8 @@ impl DataItemBuilder {
                     low,
                     close,
                     volume,
+                    buy,
+                    sell,
                 };
                 Ok(item)
             } else {
