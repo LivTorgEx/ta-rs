@@ -41,6 +41,7 @@
 //! * Other
 //!   * [Standard Deviation (SD)](indicators/struct.StandardDeviation.html)
 //!   * [Mean Absolute Deviation (MAD)](indicators/struct.MeanAbsoluteDeviation.html)
+//!   * Mean Reversion Channel (MRC)
 //!   * [Bollinger Bands (BB)](indicators/struct.BollingerBands.html)
 //!   * [Chandelier Exit (CE)](indicators/struct.ChandelierExit.html)
 //!   * [Keltner Channel (KC)](indicators/struct.KeltnerChannel.html)
@@ -60,6 +61,12 @@ mod helpers;
 
 pub mod errors;
 pub mod indicators;
+
+pub use indicators::{
+    ExponentialMovingAverageCross, ExponentialMovingAverageCrossOutput, MeanReversionChannel,
+    MeanReversionChannelOutput, NormalizedAverageTrueRange, NormalizedAverageTrueRangeOutput,
+    StochasticOscillator, StochasticOscillatorOutput,
+};
 
 mod traits;
 pub use crate::traits::*;

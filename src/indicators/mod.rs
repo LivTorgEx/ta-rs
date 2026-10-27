@@ -34,6 +34,19 @@ pub use self::true_range::TrueRange;
 mod average_true_range;
 pub use self::average_true_range::AverageTrueRange;
 
+mod normalized_average_true_range;
+pub use self::normalized_average_true_range::{
+    NormalizedAverageTrueRange, NormalizedAverageTrueRangeOutput,
+};
+
+mod stochastic_oscillator;
+pub use self::stochastic_oscillator::{StochasticOscillator, StochasticOscillatorOutput};
+
+mod exponential_moving_average_cross;
+pub use self::exponential_moving_average_cross::{
+    ExponentialMovingAverageCross, ExponentialMovingAverageCrossOutput,
+};
+
 mod moving_average_convergence_divergence;
 pub use self::moving_average_convergence_divergence::{
     MovingAverageConvergenceDivergence, MovingAverageConvergenceDivergenceOutput,
@@ -70,3 +83,6 @@ pub use self::on_balance_volume::OnBalanceVolume;
 
 mod movement;
 pub use self::movement::{Movement, MovementDirection, MovementOutput};
+
+mod mean_reversion_channel;
+pub use mean_reversion_channel::{MeanReversionChannel, MeanReversionChannelOutput};

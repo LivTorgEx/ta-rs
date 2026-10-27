@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// ```
 /// use ta::DataItem;
-/// use ta::{Open, High, Low, Close, Volume};
+/// use ta::{Open, High, Low, Close, Volume, Buy, Sell};
 ///
 /// let item = DataItem::builder()
 ///     .open(20.0)
@@ -151,23 +151,11 @@ impl DataItemBuilder {
     }
 
     pub fn build(self) -> Result<DataItem> {
-        if let (
-            Some(open),
-            Some(high),
-            Some(low),
-            Some(close),
-            Some(volume),
-            Some(buy),
-            Some(sell),
-        ) = (
-            self.open,
-            self.high,
-            self.low,
-            self.close,
-            self.volume,
-            self.buy,
-            self.sell,
-        ) {
+        if let (Some(open), Some(high), Some(low), Some(close), Some(volume)) =
+            (self.open, self.high, self.low, self.close, self.volume)
+        {
+            let buy = self.buy.unwrap_or(0.0);
+            let sell = self.sell.unwrap_or(0.0);
             // validate
             if low <= open
                 && low <= close
