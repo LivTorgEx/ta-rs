@@ -4,8 +4,13 @@ use crate::{Close, High, Low, Next, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+const INNER_MULTIPLIER: f64 = PI;
+const SMALL_MULTIPLIER: f64 = 1.77 * PI;
+const OUTER_MULTIPLIER: f64 = 2.415 * PI;
+const BIG_MULTIPLIER: f64 = 3.04 * PI;
+
 /// Mean Reversion Channel based on two-pole Super Smoothers for typical price
-/// and true range.
+/// and true range. Band factors follow KLinecharts MRC and are multiplied by PI.
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct MeanReversionChannel {
@@ -69,10 +74,9 @@ impl MeanReversionChannel {
         c2: f64,
         c3: f64,
     ) -> f64 {
-        let input_previous = input_previous.unwrap_or(input);
-        let output_previous = output_previous.unwrap_or(input);
-        let output_previous2 = output_previous2.unwrap_or(output_previous);
-        c1 * (input + input_previous) * 0.5 + c2 * output_previous + c3 * output_previous2
+        let output_previous = output_previous.or(input_previous).unwrap_or(0.0);
+        let output_previous2 = output_previous2.unwrap_or(0.0);
+        c1 * input + c2 * output_previous + c3 * output_previous2
     }
 }
 
@@ -114,8 +118,7 @@ impl<T: High + Low + Close> Next<&T> for MeanReversionChannel {
             self.c1,
             self.c2,
             self.c3,
-        )
-        .max(0.0);
+        );
         self.price_input_prev = Some(typical);
         self.price_output_prev2 = self.price_output_prev;
         self.price_output_prev = Some(middle);
@@ -125,14 +128,14 @@ impl<T: High + Low + Close> Next<&T> for MeanReversionChannel {
 
         MeanReversionChannelOutput {
             middle,
-            up_small: middle + range,
-            down_small: middle - range,
-            up_inner: middle + range * 1.77,
-            down_inner: middle - range * 1.77,
-            up_outer: middle + range * 2.415,
-            down_outer: middle - range * 2.415,
-            up_big: middle + range * 3.04,
-            down_big: middle - range * 3.04,
+            up_inner: middle + range * INNER_MULTIPLIER,
+            down_inner: middle - range * INNER_MULTIPLIER,
+            up_small: middle + range * SMALL_MULTIPLIER,
+            down_small: middle - range * SMALL_MULTIPLIER,
+            up_outer: middle + range * OUTER_MULTIPLIER,
+            down_outer: middle - range * OUTER_MULTIPLIER,
+            up_big: middle + range * BIG_MULTIPLIER,
+            down_big: middle - range * BIG_MULTIPLIER,
         }
     }
 }
